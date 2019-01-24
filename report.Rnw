@@ -1,0 +1,40 @@
+% report.Rnw
+% This file is a part of curriculum-modeling project.
+% License: MIT
+% (c) Evgeny Simonenko, 2019
+
+\documentclass{article}
+
+\usepackage[utf8x]{inputenc}
+\usepackage[OT1]{fontenc}
+\usepackage[english,russian]{babel}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE,echo=FALSE}
+
+\title{Учебные планы}
+
+\maketitle
+
+<<>>=
+library(neo4r)
+neo4jconn <- neo4r::neo4j_api$new(url = "http://localhost:7474", user = "neo4j", password = "h6u4%kr")
+if (neo4jconn$ping() != 200) {
+  print("Нет соединения с СУБД Neo4j!")
+  quit()
+}
+@
+
+\section{Все курсы}
+
+<<>>=
+call_api(query = "match (c :Course) return c.title", con = neo4jconn)
+@
+
+\section{Программы}
+
+<<>>=
+call_api(query = "match (p :Profile) return p.title, p.direction", con = neo4jconn)
+@
+
+\end{document}

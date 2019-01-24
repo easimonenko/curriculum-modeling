@@ -1,0 +1,13 @@
+{
+  "name": "curriculum-modeling",
+  "version": "1.0.0",
+  "description": "Scripts for curriculum modeling.",
+  "main": "report.js",
+  "repository": "https://github.com/easimonenko/curriculum-modeling",
+  "author": "<easimonenko@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "handlebars": "^4.0.12",
+    "neo4j-driver": "^1.7.2"
+  }
+}

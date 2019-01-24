@@ -1,0 +1,76 @@
+<!--
+report.handlebars
+This file is a part of curriculum-modeling project.
+License: MIT
+(c) Evgeny Simonenko, 2019
+-->
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Учебные планы</title>
+    <style>
+        body {
+            padding: 1em;
+        }
+
+        h1 {
+            font-size: 16pt;
+        }
+
+        p {
+            font-size: 14pt;
+        }
+
+        table th,
+        td {
+            font-family: 'Ubuntu Mono', 'Monospace';
+            font-size: 14pt;
+            border-top: 1px solid rgba(0, 0, 0, .12);
+            border-bottom: 1px solid rgba(0, 0, 0, .12);
+            padding: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    {{#each profiles}}
+    <h1>{{./title}}</h1>
+    <p>Уровень: {{./level}}</p>
+    <p>Направление: {{./direction}}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Семестр</th>
+                <th>Трудоёмкость</th>
+                <th>КР</th>
+                <th>КП</th>
+                <th>Зачёт</th>
+                <th>Экзамен</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each ./courses}}
+            <tr>
+                <td>{{./title}}</td>
+                <td>{{./semester}}</td>
+                <td>{{./laboriousness}}</td>
+                <td>{{#if ./coursework}}V{{/if}}</td>
+                <td>{{#if ./project}}V{{/if}}</td>
+                <td>{{#if ./credit}}V{{/if}}</td>
+                <td>{{#if ./exam}}V{{/if}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <p>Общая трудоёмкость: {{./laboriousness}}. Количество дисциплин: {{./courses_count}}</p>
+    {{/each}}
+</body>
+
+</html>

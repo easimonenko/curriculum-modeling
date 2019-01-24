@@ -1,0 +1,6 @@
+{
+    "user": "neo4j",
+    "password": "h6u4%kr",
+    "port": 7687,
+    "url": "bolt://localhost"
+}
