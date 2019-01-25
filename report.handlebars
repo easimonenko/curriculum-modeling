@@ -35,13 +35,17 @@ License: MIT
             border-bottom: 1px solid rgba(0, 0, 0, .12);
             padding: 0.5em;
         }
+
+        .label {
+            font-style: italic;
+        }
     </style>
 </head>
 
 <body>
     {{#each profiles}}
     <h1>{{./title}}</h1>
-    <p>Уровень: {{./level}}</p>
+    <p><span class="label">Уровень</span>: {{./level}}</p>
     <p>Направление: {{./direction}}</p>
     <table>
         <thead>
@@ -69,8 +73,17 @@ License: MIT
             {{/each}}
         </tbody>
     </table>
-    <p>Общая трудоёмкость: {{./laboriousness}}. Количество дисциплин: {{./courses_count}}</p>
+    <p><span class="label">Общая трудоёмкость</span>: {{./laboriousness}}.
+        <span class="label">Количество дисциплин</span>: {{./courses_count}}.
+        <span class="label">Количество экзаменов</span>: {{./exams_count}}.
+        <span class="label">Количество зачётов</span>: {{./credits_count}}.
+        <span class="label">Количество курсовых работ</span>: {{./courseworks_count}}.
+        <span class="label">Количество курсовых проектов</span>: {{./projects_count}}.</p>
     {{/each}}
+
+    <hr />
+
+    <p>Report generated with <a href="https://github.com/easimonenko/curriculum-modeling">curriculum-modeling</a>.</p>
 </body>
 
 </html>

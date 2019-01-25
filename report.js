@@ -44,6 +44,18 @@ session.run('MATCH (p :Profile) RETURN p').then(result => {
         return a + parseInt(c.laboriousness)
       }, 0)
       profile['courses_count'] = profile['courses'].length
+      profile['exams_count'] = profile['courses'].reduce((a, c) => {
+        return a + (c.exam ? 1 : 0)
+      }, 0)
+      profile['credits_count'] = profile['courses'].reduce((a, c) => {
+        return a + (c.credit ? 1 : 0)
+      }, 0)
+      profile['courseworks_count'] = profile['courses'].reduce((a, c) => {
+        return a + (c.coursework ? 1 : 0)
+      }, 0)
+      profile['projects_count'] = profile['courses'].reduce((a, c) => {
+        return a + (c.project ? 1 : 0)
+      }, 0)
       return profile
     })
   })).then(profiles => {
