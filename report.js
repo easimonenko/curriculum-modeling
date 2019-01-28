@@ -37,25 +37,70 @@ const profilesPromise = session.run('MATCH (p :Profile) RETURN p').then(result =
       'ORDER BY semester, title;\n', {
         title: profile.title
       }).then(result => {
-      profile['courses'] = result.records.map(record => {
+      const courses = result.records.map(record => {
         return record.toObject()
       })
-      profile['laboriousness'] = profile['courses'].reduce((a, c) => {
+
+      const semesters_numbers = new Set()
+      courses.forEach(c => {
+        semesters_numbers.add(parseInt(c.semester))
+      })
+
+      profile['semesters'] = Array.from(semesters_numbers).map(s => {
+        const semester = {
+          number: s,
+          courses: courses.filter(c => {
+            return c.semester == s
+          })
+        }
+
+        semester['courses_count'] = semester.courses.length
+
+        semester['laboriousness'] = semester.courses.reduce((a, c) => {
+          return a + parseInt(c.laboriousness)
+        }, 0)
+
+        semester['exams_count'] = semester.courses.reduce((a, c) => {
+          return a + (c.exam ? 1 : 0)
+        }, 0)
+
+        semester['credits_count'] = semester.courses.reduce((a, c) => {
+          return a + (c.credit ? 1 : 0)
+        }, 0)
+
+        semester['courseworks_count'] = semester.courses.reduce((a, c) => {
+          return a + (c.coursework ? 1 : 0)
+        }, 0)
+
+        semester['projects_count'] = semester.courses.reduce((a, c) => {
+          return a + (c.project ? 1 : 0)
+        }, 0)
+
+        return semester
+      })
+
+      profile['laboriousness'] = courses.reduce((a, c) => {
         return a + parseInt(c.laboriousness)
       }, 0)
-      profile['courses_count'] = profile['courses'].length
-      profile['exams_count'] = profile['courses'].reduce((a, c) => {
+
+      profile['courses_count'] = courses.length
+
+      profile['exams_count'] = courses.reduce((a, c) => {
         return a + (c.exam ? 1 : 0)
       }, 0)
-      profile['credits_count'] = profile['courses'].reduce((a, c) => {
+
+      profile['credits_count'] = courses.reduce((a, c) => {
         return a + (c.credit ? 1 : 0)
       }, 0)
-      profile['courseworks_count'] = profile['courses'].reduce((a, c) => {
+
+      profile['courseworks_count'] = courses.reduce((a, c) => {
         return a + (c.coursework ? 1 : 0)
       }, 0)
-      profile['projects_count'] = profile['courses'].reduce((a, c) => {
+
+      profile['projects_count'] = courses.reduce((a, c) => {
         return a + (c.project ? 1 : 0)
       }, 0)
+
       return profile
     })
   }))
@@ -86,22 +131,29 @@ const teachersPromise = session.run('MATCH (t :Teacher) RETURN t').then(result =
       teacher['courses'] = result.records.map(record => {
         return record.toObject()
       })
+
       teacher['laboriousness'] = teacher['courses'].reduce((a, c) => {
         return a + parseInt(c.laboriousness)
-      }, 0) * 36 / 2;
+      }, 0) * 36 / 2
+
       teacher['courses_count'] = teacher['courses'].length
+
       teacher['exams_count'] = teacher['courses'].reduce((a, c) => {
         return a + (c.exam ? 1 : 0)
       }, 0)
+
       teacher['credits_count'] = teacher['courses'].reduce((a, c) => {
         return a + (c.credit ? 1 : 0)
       }, 0)
+
       teacher['courseworks_count'] = teacher['courses'].reduce((a, c) => {
         return a + (c.coursework ? 1 : 0)
       }, 0)
+
       teacher['projects_count'] = teacher['courses'].reduce((a, c) => {
         return a + (c.project ? 1 : 0)
       }, 0)
+
       return teacher
     })
   }))
