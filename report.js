@@ -18,7 +18,7 @@ const neo4jAuth = neo4j.auth.basic(neo4jConfig.user, neo4jConfig.password)
 const driver = neo4j.driver(neo4jUri, neo4jAuth)
 const session = driver.session()
 
-session.run('MATCH (p :Profile) RETURN p').then(result => {
+const profilesPromise = session.run('MATCH (p :Profile) RETURN p').then(result => {
   const profiles = result.records.map(record => {
     return record.get(0).properties
   })
@@ -58,13 +58,63 @@ session.run('MATCH (p :Profile) RETURN p').then(result => {
       }, 0)
       return profile
     })
-  })).then(profiles => {
+  }))
+})
+
+const teachersPromise = session.run('MATCH (t :Teacher) RETURN t').then(result => {
+  const teachers = result.records.map(record => {
+    return record.get(0).properties
+  })
+
+  return Promise.all(teachers.map(teacher => {
+    return session.run(
+      'MATCH (t :Teacher {surname: $surname, name: $name})-[:teaches]->(c :Course)-[:takesPlaceIn]->(s :Semester)\n' +
+      'MATCH (c)<-[:contains]-(p :Profile)' +
+      'RETURN\n' +
+      'c.title as title,\n' +
+      'p.direction as direction,\n' +
+      's.number as semester,\n' +
+      'c.laboriousness as laboriousness,\n' +
+      'c.coursework as coursework,\n' +
+      'c.project as project,\n' +
+      'c.credit as credit,\n' +
+      'c.exam as exam\n' +
+      'ORDER BY semester, title, direction;\n', {
+        surname: teacher.surname,
+        name: teacher.name
+      }).then(result => {
+      teacher['courses'] = result.records.map(record => {
+        return record.toObject()
+      })
+      teacher['laboriousness'] = teacher['courses'].reduce((a, c) => {
+        return a + parseInt(c.laboriousness)
+      }, 0) * 36 / 2;
+      teacher['courses_count'] = teacher['courses'].length
+      teacher['exams_count'] = teacher['courses'].reduce((a, c) => {
+        return a + (c.exam ? 1 : 0)
+      }, 0)
+      teacher['credits_count'] = teacher['courses'].reduce((a, c) => {
+        return a + (c.credit ? 1 : 0)
+      }, 0)
+      teacher['courseworks_count'] = teacher['courses'].reduce((a, c) => {
+        return a + (c.coursework ? 1 : 0)
+      }, 0)
+      teacher['projects_count'] = teacher['courses'].reduce((a, c) => {
+        return a + (c.project ? 1 : 0)
+      }, 0)
+      return teacher
+    })
+  }))
+})
+
+Promise.all([profilesPromise, teachersPromise]).then(([profiles, teachers]) => {
     const report = handlebars.compile(fs.readFileSync('./report.handlebars').toString())
     process.stdout.write(report({
-      profiles: profiles
+      profiles: profiles,
+      teachers: teachers
     }))
   })
-}).then(() => {
-  session.close()
-  driver.close()
-})
+  .then(() => {
+    session.close()
+    driver.close()
+  })

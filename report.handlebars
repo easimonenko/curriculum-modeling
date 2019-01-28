@@ -23,6 +23,10 @@ License: MIT
             font-size: 16pt;
         }
 
+        h2 {
+            font-size: 14pt;
+        }
+
         p {
             font-size: 14pt;
         }
@@ -45,8 +49,11 @@ License: MIT
 <body>
     {{#each profiles}}
     <h1>{{./title}}</h1>
+
     <p><span class="label">Уровень</span>: {{./level}}</p>
+
     <p>Направление: {{./direction}}</p>
+
     <table>
         <thead>
             <tr>
@@ -73,6 +80,51 @@ License: MIT
             {{/each}}
         </tbody>
     </table>
+
+    <p><span class="label">Общая трудоёмкость</span>: {{./laboriousness}}.
+        <span class="label">Количество дисциплин</span>: {{./courses_count}}.
+        <span class="label">Количество экзаменов</span>: {{./exams_count}}.
+        <span class="label">Количество зачётов</span>: {{./credits_count}}.
+        <span class="label">Количество курсовых работ</span>: {{./courseworks_count}}.
+        <span class="label">Количество курсовых проектов</span>: {{./projects_count}}.</p>
+    {{/each}}
+
+    <hr />
+
+    <h1>Преподаватели</h1>
+
+    {{#each teachers}}
+    <h2>{{./surname}} {{./name}}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Направление</th>
+                <th>Семестр</th>
+                <th>Трудоёмкость</th>
+                <th>КР</th>
+                <th>КП</th>
+                <th>Зачёт</th>
+                <th>Экзамен</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each ./courses}}
+            <tr>
+                <td>{{./title}}</td>
+                <td>{{./direction}}</td>
+                <td>{{./semester}}</td>
+                <td>{{./laboriousness}}</td>
+                <td>{{#if ./coursework}}V{{/if}}</td>
+                <td>{{#if ./project}}V{{/if}}</td>
+                <td>{{#if ./credit}}V{{/if}}</td>
+                <td>{{#if ./exam}}V{{/if}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
     <p><span class="label">Общая трудоёмкость</span>: {{./laboriousness}}.
         <span class="label">Количество дисциплин</span>: {{./courses_count}}.
         <span class="label">Количество экзаменов</span>: {{./exams_count}}.
