@@ -18,7 +18,7 @@ const neo4jAuth = neo4j.auth.basic(neo4jConfig.user, neo4jConfig.password)
 const driver = neo4j.driver(neo4jUri, neo4jAuth)
 const session = driver.session()
 
-const profilesPromise = session.run('MATCH (p :Profile) RETURN p').then(result => {
+const profilesPromise = session.run('MATCH (p :Profile) RETURN p ORDER BY p.direction').then(result => {
   const profiles = result.records.map(record => {
     return record.get(0).properties
   })
@@ -26,14 +26,15 @@ const profilesPromise = session.run('MATCH (p :Profile) RETURN p').then(result =
   return Promise.all(profiles.map(profile => {
     return session.run(
       'MATCH (p :Profile {title: $title})-[:contains]->(c :Course)-[:takesPlaceIn]->(s :Semester)\n' +
-      'return\n' +
-      'c.title as title,\n' +
-      's.number as semester,\n' +
-      'c.laboriousness as laboriousness,\n' +
-      'c.coursework as coursework,\n' +
-      'c.project as project,\n' +
-      'c.credit as credit,\n' +
-      'c.exam as exam\n' +
+      'RETURN\n' +
+      'id(c) AS id,\n' +
+      'c.title AS title,\n' +
+      's.number AS semester,\n' +
+      'c.laboriousness AS laboriousness,\n' +
+      'c.coursework AS coursework,\n' +
+      'c.project AS project,\n' +
+      'c.credit AS credit,\n' +
+      'c.exam AS exam\n' +
       'ORDER BY semester, title;\n', {
         title: profile.title
       }).then(result => {
@@ -106,6 +107,16 @@ const profilesPromise = session.run('MATCH (p :Profile) RETURN p').then(result =
   }))
 })
 
+const notesPromise = session.run('MATCH (c :Course)\n' +
+  'RETURN id(c) AS id, c.title AS title, c.notes AS notes\n' +
+  'ORDER BY title').then(result => {
+  const notes = result.records.map(record => {
+    return record.toObject()
+  })
+
+  return notes
+})
+
 const teachersPromise = session.run('MATCH (t :Teacher) RETURN t').then(result => {
   const teachers = result.records.map(record => {
     return record.get(0).properties
@@ -159,10 +170,11 @@ const teachersPromise = session.run('MATCH (t :Teacher) RETURN t').then(result =
   }))
 })
 
-Promise.all([profilesPromise, teachersPromise]).then(([profiles, teachers]) => {
+Promise.all([profilesPromise, notesPromise, teachersPromise]).then(([profiles, notes, teachers]) => {
     const report = handlebars.compile(fs.readFileSync('./report.handlebars').toString())
     process.stdout.write(report({
       profiles: profiles,
+      notes: notes,
       teachers: teachers
     }))
   })
