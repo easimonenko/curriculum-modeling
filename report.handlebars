@@ -47,20 +47,40 @@ License: MIT
         .label {
             font-style: italic;
         }
+
+        li {
+            margin: 0.5em;
+        }
     </style>
 </head>
 
 <body>
+    <h1>Учебные планы</h1>
+
+    <p>Оглавление:</p>
+
+    <ul>
+        {{#each profiles}}
+        <li><a href="#{{id}}">{{title}}</a></li>
+        {{/each}}
+        <li><a href="#notes">Краткое описание дисциплин</a></li>
+        <li><a href="#teachers">Преподаватели</a></li>
+    </ul>
+
+    <hr />
+
     {{#each profiles}}
-    <h1>{{./title}}</h1>
+    <h2><a name="{{id}}">{{title}}</a></h2>
 
     <p><span class="label">Уровень</span>: {{./level}}</p>
 
     <p><span class="label">Направление</span>: {{./direction}}</p>
 
+    <p><span class="label">Аннотация</span>: {{./abstract}}</p>
+
     {{#each ./semesters}}
 
-    <h2>{{./number}} семестр</h2>
+    <h3>{{./number}} семестр</h3>
 
     <table>
         <thead>
@@ -98,7 +118,7 @@ License: MIT
     </table>
     {{/each}}
 
-    <h2>Общая статистика</h2>
+    <h3>Общая статистика</h3>
 
     <p><span class="label">Общая трудоёмкость</span>: {{./laboriousness}}.</p>
     <p><span class="label">Количество дисциплин</span>: {{./courses_count}}.</p>
@@ -112,20 +132,28 @@ License: MIT
 
     <hr />
 
-    <h1>Краткое описание дисциплин</h1>
+    <h2><a name="notes">Краткое описание дисциплин</a></h2>
 
     {{#each notes}}
-    <h2><a name="{{./id}}">{{./title}}</a></h2>
+    <h3><a name="{{./id}}">{{./title}}</a></h3>
 
     <p>{{./notes}}</p>
+
+    <p>Зависит от:</p>
+
+    <ul>
+        {{#each dependencies}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
     {{/each}}
 
     <hr />
 
-    <h1>Преподаватели</h1>
+    <h2><a name="teachers">Преподаватели</a></h2>
 
     {{#each teachers}}
-    <h2>{{./surname}} {{./name}}</h2>
+    <h3>{{./surname}} {{./name}}</h3>
 
     <table>
         <thead>

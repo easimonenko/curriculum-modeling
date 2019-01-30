@@ -18,9 +18,12 @@ const neo4jAuth = neo4j.auth.basic(neo4jConfig.user, neo4jConfig.password)
 const driver = neo4j.driver(neo4jUri, neo4jAuth)
 const session = driver.session()
 
-const profilesPromise = session.run('MATCH (p :Profile) RETURN p ORDER BY p.direction').then(result => {
+const profilesPromise = session.run('MATCH (p :Profile) RETURN p, id(p) ORDER BY p.direction').then(result => {
   const profiles = result.records.map(record => {
-    return record.get(0).properties
+    const profile = record.get(0).properties
+    profile.id = record.get(1)
+
+    return profile
   })
 
   return Promise.all(profiles.map(profile => {
@@ -114,7 +117,27 @@ const notesPromise = session.run('MATCH (c :Course)\n' +
     return record.toObject()
   })
 
-  return notes
+  return Promise.all(notes.map(note => {
+    return session.run('MATCH (c :Course {title: $title})\n' +
+      'MATCH (c)-[:dependsOn]->(d)\n' +
+      'RETURN d.title AS dependencie\n' +
+      'ORDER BY dependencie', {
+        title: note.title
+      }
+    ).then(result => {
+      const dependencies = new Set()
+
+      result.records.map(record => {
+        return record.toObject()
+      }).forEach(d => {
+        dependencies.add(d.dependencie)
+      })
+
+      note.dependencies = Array.from(dependencies)
+
+      return note
+    })
+  }))
 })
 
 const teachersPromise = session.run('MATCH (t :Teacher) RETURN t').then(result => {
