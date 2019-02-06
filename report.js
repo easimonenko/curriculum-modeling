@@ -150,6 +150,7 @@ const teachersPromise = session.run('MATCH (t :Teacher) RETURN t').then(result =
       'MATCH (t :Teacher {surname: $surname, name: $name})-[:teaches]->(c :Course)-[:takesPlaceIn]->(s :Semester)\n' +
       'MATCH (c)<-[:contains]-(p :Profile)' +
       'RETURN\n' +
+      'id(c) as id,\n' +
       'c.title as title,\n' +
       'p.direction as direction,\n' +
       's.number as semester,\n' +
