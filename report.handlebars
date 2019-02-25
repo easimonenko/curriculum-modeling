@@ -27,16 +27,23 @@ License: MIT
             font-size: 14pt;
         }
 
+        h3 {
+            font-size: 13pt;
+        }
+
         p {
-            font-size: 14pt;
+            font-size: 13pt;
+        }
+
+        table {
+            border-collapse: collapse;
         }
 
         table th,
         td {
             font-family: 'Ubuntu Mono', 'Monospace';
-            font-size: 14pt;
-            border-top: 1px solid rgba(0, 0, 0, .12);
-            border-bottom: 1px solid rgba(0, 0, 0, .12);
+            font-size: 13pt;
+            border: 1px solid rgba(0, 0, 0, .12);
             padding: 0.5em;
         }
 
@@ -85,9 +92,9 @@ License: MIT
     <table>
         <thead>
             <tr>
+                <th>Вид</th>
                 <th>Название</th>
-                <!--th>Семестр</th-->
-                <th>Трудоёмкость</th>
+                <th>Труд.</th>
                 <th>КР</th>
                 <th>КП</th>
                 <th>Зачёт</th>
@@ -97,8 +104,8 @@ License: MIT
         <tbody>
             {{#each ./courses}}
             <tr>
+                <td>{{#if basic}}Б{{else if variative}}В{{else if elective}}Э{{/if}}</td>
                 <td><a href="#{{id}}">{{title}}</a></td>
-                <!--td>{{./semester}}</td-->
                 <td>{{./laboriousness}}</td>
                 <td>{{#if ./coursework}}V{{/if}}</td>
                 <td>{{#if ./project}}V{{/if}}</td>
@@ -107,6 +114,7 @@ License: MIT
             </tr>
             {{/each}}
             <tr class="summary">
+                <td></td>
                 <td>Всего дисциплин: {{./courses_count}}</td>
                 <td>{{./laboriousness}}</td>
                 <td>{{./courseworks_count}}</td>

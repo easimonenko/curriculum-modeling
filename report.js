@@ -31,6 +31,7 @@ const profilesPromise = session.run('MATCH (p :Profile) RETURN p, id(p) ORDER BY
       'MATCH (p :Profile {title: $title})-[:contains]->(c :Course)-[:takesPlaceIn]->(s :Semester)\n' +
       'RETURN\n' +
       'id(c) AS id,\n' +
+      'c.level AS level,\n' +
       'c.title AS title,\n' +
       's.number AS semester,\n' +
       'c.laboriousness AS laboriousness,\n' +
@@ -42,7 +43,17 @@ const profilesPromise = session.run('MATCH (p :Profile) RETURN p, id(p) ORDER BY
         title: profile.title
       }).then(result => {
       const courses = result.records.map(record => {
-        return record.toObject()
+        const c = record.toObject()
+
+        if (c.level == 'basic') {
+          c['basic'] = true
+        } else if (c.level == 'variative') {
+          c['variative'] = true
+        } else if (c.level == 'elective') {
+          c['elective'] = true
+        }
+
+        return c
       })
 
       const semesters_numbers = new Set()
